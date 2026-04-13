@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 8391c6ea3865e414e8cef63b2987c6a0
+guid: 2984040458704044d9e679191b37d65e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7680820834086852892
-    second: 16_0
+      213: 1806762593315652507
+    second: Rock3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,45 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: 16_0
+      name: Rock3_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 64
-        width: 64
-        height: 64
+        x: 13
+        y: 11
+        width: 41
+        height: 31
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: c199a279ad1c79a60800000000000000
-      internalID: 7680820834086852892
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: 16_1
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f65417c5e7b38a149ac13cfc2e05ad4f
-      internalID: 1319778738
+      spriteID: b930b088109e21910800000000000000
+      internalID: 1806762593315652507
       vertices: []
       indices: 
       edges: []
@@ -147,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: d7b377d580e787a49af1b732815589db
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -155,12 +133,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":1,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      16_0: 7680820834086852892
-      16_1: 1319778738
+      Rock3_0: 1806762593315652507
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
