@@ -6,6 +6,7 @@ public class Enemy_Movement : MonoBehaviour
     public float speed;
     private Rigidbody2D rb;
     private Transform player;
+    public float attackRange = 2;
     //private bool isChasing;
     private int facingDirection = -1;
     private Animator anim;
@@ -26,16 +27,29 @@ public class Enemy_Movement : MonoBehaviour
     {
         if (enemyState == EnemyState.Chasing)
         {
-            //I think the problem code is in this section - Enemy faces the right direction initially then messes up
-            if(player.position.x > transform.position.x && facingDirection == -1 ||
-                player.position.x < transform.position.x && facingDirection == 1)
-            {
-                Flip();
-            }
-            Vector2 direction = (player.position - transform.position).normalized;
-            rb.linearVelocity = direction * speed;
+            Chase();
+        }
+        else if (enemyState == EnemyState.Attacking)
+        {
+            rb.linearVelocity = Vector2.zero;
         }
       
+    }
+
+    void Chase()
+    {
+        if(Vector2.Distance(transform.position, player.transform.position) <= attackRange)
+        {
+            ChangeState(EnemyState.Attacking);
+        }
+        //I think the problem code is in this section - Enemy faces the right direction initially then messes up
+        else if (player.position.x > transform.position.x && facingDirection == -1 ||
+            player.position.x < transform.position.x && facingDirection == 1)
+        {
+            Flip();
+        }
+        Vector2 direction = (player.position - transform.position).normalized;
+        rb.linearVelocity = direction * speed;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -77,6 +91,8 @@ public class Enemy_Movement : MonoBehaviour
             anim.SetBool("isIdle", false);
         else if (enemyState == EnemyState.Chasing)
             anim.SetBool("isChasing", false);
+        else if (enemyState == EnemyState.Attacking)
+            anim.SetBool("isAttacking", false);
 
         //Update our current State
         enemyState = newState;
@@ -86,6 +102,8 @@ public class Enemy_Movement : MonoBehaviour
             anim.SetBool("isIdle", true);
         else if (enemyState == EnemyState.Chasing)
             anim.SetBool("isChasing", true);
+        else if (enemyState == EnemyState.Attacking)
+            anim.SetBool("isAttacking", true);
 
     }
 }
@@ -94,4 +112,5 @@ public enum EnemyState
 {
     Idle,
     Chasing,
+    Attacking,
 }

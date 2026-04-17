@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 
 public class Enemy_Combat : MonoBehaviour
@@ -7,5 +8,10 @@ public class Enemy_Combat : MonoBehaviour
     {
         if(collision.gameObject.tag == "Player")
         collision.gameObject.GetComponent<PlayerHealth>().ChangeHealth(damage);
+    }
+
+    public void Attack()
+    {
+        Debug.Log("Attacking Player");
     }
 }
