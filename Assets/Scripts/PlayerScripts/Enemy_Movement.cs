@@ -26,6 +26,7 @@ public class Enemy_Movement : MonoBehaviour
     {
         if (enemyState == EnemyState.Chasing)
         {
+            //I think the problem code is in this section - Enemy faces the right direction initially then messes up
             if(player.position.x > transform.position.x && facingDirection == -1 ||
                 player.position.x < transform.position.x && facingDirection == 1)
             {
