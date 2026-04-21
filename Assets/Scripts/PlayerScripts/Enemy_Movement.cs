@@ -1,12 +1,20 @@
+using Unity.Cinemachine;
 using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class Enemy_Movement : MonoBehaviour
 {
+    public float attackRange = 2;
     public float speed;
+    public float attackCooldown = 2;
+    public float playerDetectionRange = 5;
+    public Transform detectionPoint;
+    public LayerMask playerLayer;
+
+    private float attackCooldownTimer; 
     private Rigidbody2D rb;
     private Transform player;
-    public float attackRange = 2;
+    
     //private bool isChasing;
     private int facingDirection = -1;
     private Animator anim;
@@ -25,6 +33,12 @@ public class Enemy_Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckForPlayer();
+
+        if (attackCooldownTimer > 0)
+        {
+            attackCooldownTimer -= Time.deltaTime;
+        }
         if (enemyState == EnemyState.Chasing)
         {
             Chase();
@@ -38,12 +52,9 @@ public class Enemy_Movement : MonoBehaviour
 
     void Chase()
     {
-        if(Vector2.Distance(transform.position, player.transform.position) <= attackRange)
-        {
-            ChangeState(EnemyState.Attacking);
-        }
+        
         //I think the problem code is in this section - Enemy faces the right direction initially then messes up
-        else if (player.position.x > transform.position.x && facingDirection == -1 ||
+        if (player.position.x > transform.position.x && facingDirection == -1 ||
             player.position.x < transform.position.x && facingDirection == 1)
         {
             Flip();
@@ -52,33 +63,35 @@ public class Enemy_Movement : MonoBehaviour
         rb.linearVelocity = direction * speed;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void CheckForPlayer()
     {
-        if (collision.gameObject.tag == "Player")
+        Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectionRange, playerLayer);
+        if (hits.Length > 0 )
         {
-            if (player == null)
+            player = hits[0].transform;
+
+            if (Vector2.Distance(transform.position, player.transform.position) <= attackRange && attackCooldown <= 0)
             {
-                player = collision.transform;
+                attackCooldownTimer = attackCooldown;
+                ChangeState(EnemyState.Attacking);
             }
-            
-            
-            ChangeState(EnemyState.Chasing);
+
+            else if(Vector2.Distance(transform.position, player.position) > attackRange && enemyState !=EnemyState.Attacking)
+            {
+                ChangeState(EnemyState.Chasing);
+            }
+               
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+
+            ChangeState(EnemyState.Idle);
         }
        
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "Player")
-        {
-            rb.linearVelocity = Vector2.zero;
-            
-            ChangeState(EnemyState.Idle);
-        }
-           
-    }
-
-    void Flip()
+       void Flip()
     {
         facingDirection = 1;
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
@@ -105,6 +118,12 @@ public class Enemy_Movement : MonoBehaviour
         else if (enemyState == EnemyState.Attacking)
             anim.SetBool("isAttacking", true);
 
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(detectionPoint.position, playerDetectionRange);
     }
 }
 
