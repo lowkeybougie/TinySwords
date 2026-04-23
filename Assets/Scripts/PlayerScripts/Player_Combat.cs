@@ -7,7 +7,8 @@ public class Player_Combat : MonoBehaviour
     public Transform attackPoint;
     public float weaponRange = 1;
     public float knockbackForce = 50; // The force YOU exert on enemies
-    public float stunTime = 0.2f;
+    public float stunTime = 0.3f;
+    public float knockbackTime = .15f; 
     public LayerMask enemyLayer;
     public int damage = 1;
     public float cooldown = 2;
@@ -42,7 +43,7 @@ public class Player_Combat : MonoBehaviour
         {
             enemy.GetComponent<Enemy_Health>().ChangeHealth(-damage);
             // Push the enemy away using YOUR force
-            enemy.GetComponent<KnockBack>().Knockback(transform, knockbackForce, stunTime);
+            enemy.GetComponent<KnockBack>().Knockback(transform, knockbackForce, knockbackTime, stunTime);
         }
     }
 

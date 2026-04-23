@@ -13,7 +13,7 @@ public class KnockBack : MonoBehaviour
         enemy_Movement = GetComponent<Enemy_Movement>();
     }
 
-    public void Knockback(Transform attackerTransform, float force, float stunTime)
+    public void Knockback(Transform attackerTransform, float force, float stunTime, float knockbackTime)
     {
         enemy_Movement.ChangeState(EnemyState.Knockback);
         StopAllCoroutines();
@@ -21,13 +21,14 @@ public class KnockBack : MonoBehaviour
         Vector2 direction = (transform.position - attackerTransform.position).normalized;
         rb.linearVelocity = direction * force;
 
-        StartCoroutine(StunTimer(stunTime));
+        StartCoroutine(StunTimer(knockbackTime, stunTime));
     }
 
-    IEnumerator StunTimer(float stunTime)
+    IEnumerator StunTimer(float knockbackTime, float stunTime)
     {
-        yield return new WaitForSeconds(stunTime);
+        yield return new WaitForSeconds(knockbackTime);
         rb.linearVelocity = Vector2.zero; // Abrupt stop
+        yield return new WaitForSeconds(stunTime);
         enemy_Movement.ChangeState(EnemyState.Idle);
     }
 }
