@@ -16,6 +16,11 @@ public class Player_Combat : MonoBehaviour
 
     private Rigidbody2D rb;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip attackSFX;
+    public AudioClip playerHitSFX;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,6 +37,8 @@ public class Player_Combat : MonoBehaviour
         {
             anim.SetBool("isAttacking", true);
             timer = cooldown;
+            // Play attack sound
+            if (attackSFX != null) audioSource.PlayOneShot(attackSFX);
         }
     }
 
@@ -54,6 +61,7 @@ public class Player_Combat : MonoBehaviour
         Vector2 direction = (transform.position - enemyTransform.position).normalized;
         rb.linearVelocity = direction * force;
         StartCoroutine(StunTimer(stun));
+        if (playerHitSFX != null) audioSource.PlayOneShot(playerHitSFX);
     }
 
     IEnumerator StunTimer(float time)

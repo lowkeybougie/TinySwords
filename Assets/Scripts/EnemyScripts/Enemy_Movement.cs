@@ -1,5 +1,3 @@
-using Unity.Cinemachine;
-using UnityEditor.Tilemaps;
 using UnityEngine;
 
 public class Enemy_Movement : MonoBehaviour
@@ -11,128 +9,135 @@ public class Enemy_Movement : MonoBehaviour
     public Transform detectionPoint;
     public LayerMask playerLayer;
 
-    private float attackCooldownTimer; 
+    private float attackCooldownTimer;
     private Rigidbody2D rb;
     private Transform player;
-    
-    //private bool isChasing;
     private int facingDirection = 1;
     private Animator anim;
     private EnemyState enemyState;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    
+    void Awake()
     {
-        
+        // Getting components should stay in Awake or Start
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        ChangeState(EnemyState.Idle);
     }
 
-    // Update is called once per frame
+    // Add this new function:
+    void OnEnable()
+    {
+        // This runs every time the enemy is "spawned" from the pool
+        attackCooldownTimer = 0; // Reset their attack brain
+
+        if (player == null)
+        {
+            ChangeState(EnemyState.Idle);
+        }
+    }
+
+
     void Update()
     {
+        // Don't process movement/AI logic if we are being knocked back
         if (enemyState != EnemyState.Knockback)
         {
             CheckForPlayer();
 
             if (attackCooldownTimer > 0)
-            {
                 attackCooldownTimer -= Time.deltaTime;
-            }
+
             if (enemyState == EnemyState.Chasing)
-            {
                 Chase();
-            }
-            else if (enemyState == EnemyState.Attacking)
-            {
-                rb.linearVelocity = Vector2.zero;
-            }
+            else if (enemyState == EnemyState.Attacking || enemyState == EnemyState.Idle)
+                rb.linearVelocity = Vector2.zero; // Abrupt stop
         }
-      
     }
 
     void Chase()
     {
-        
-       
-        if (player.position.x > transform.position.x && facingDirection == -1 ||
-            player.position.x < transform.position.x && facingDirection == 1)
+        if (player == null) return;
+
+        // Handle Flipping Sprite
+        if (player.position.x > transform.position.x && facingDirection == -1 || player.position.x < transform.position.x && facingDirection == 1)
         {
             Flip();
         }
+
+        // Direct movement toward target
         Vector2 direction = (player.position - transform.position).normalized;
         rb.linearVelocity = direction * speed;
     }
 
     private void CheckForPlayer()
-{
-    Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectionRange, playerLayer);
-    
-    if (hits.Length > 0)
     {
-        player = hits[0].transform;
-        float distance = Vector2.Distance(transform.position, player.position);
+        Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectionRange, playerLayer);
 
-        // FIX: Check 'attackCooldownTimer' instead of the 'attackCooldown' stat
-        // Also check if we are NOT already in the attacking state
-        if (distance <= attackRange && attackCooldownTimer <= 0 && enemyState != EnemyState.Attacking)
+        if (hits.Length > 0)
         {
-            attackCooldownTimer = attackCooldown;
-            ChangeState(EnemyState.Attacking);
-            
-            // Trigger the actual combat code here
-            //GetComponent<Enemy_Combat>().Attack();
+            player = hits[0].transform;
         }
-        else if (distance > attackRange && enemyState != EnemyState.Attacking)
+
+        if (player != null)
         {
-            ChangeState(EnemyState.Chasing);
+            float distance = Vector2.Distance(transform.position, player.position);
+
+            if (distance <= attackRange && attackCooldownTimer <= 0 && enemyState != EnemyState.Attacking)
+            {
+                attackCooldownTimer = attackCooldown;
+                ChangeState(EnemyState.Attacking);
+            }
+            else if (distance > attackRange && enemyState != EnemyState.Attacking)
+            {
+                ChangeState(EnemyState.Chasing);
+            }
+        }
+        else
+        {
+            ChangeState(EnemyState.Idle);
         }
     }
-    else
-    {
-        rb.linearVelocity = Vector2.zero;
-        ChangeState(EnemyState.Idle);
-    }
-}
 
-       void Flip()
+    public void SetInitialAggro(Transform targetTransform)
     {
-        facingDirection *= -1;
-        transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+        this.player = targetTransform;
+        ChangeState(EnemyState.Chasing);
+        Chase();
     }
 
     public void ChangeState(EnemyState newState)
     {
-        if (enemyState == newState) return; // Important: prevents restarting the animation every frame
+        if (enemyState == newState) return;
 
         enemyState = newState;
-
-        // Reset bools for Move/Idle
         anim.SetBool("isIdle", newState == EnemyState.Idle);
         anim.SetBool("isChasing", newState == EnemyState.Chasing);
 
-        // Fire trigger for Attack
         if (newState == EnemyState.Attacking)
         {
             anim.SetTrigger("attackTrigger");
         }
     }
 
+    void Flip()
+    {
+        facingDirection *= -1;
+        transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+    }
 
     private void OnDrawGizmosSelected()
     {
+        if (detectionPoint == null) return;
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(detectionPoint.position, playerDetectionRange);
     }
 }
 
+// THIS PART FIXES YOUR ERRORS: It must be outside the class brackets
 public enum EnemyState
 {
     Idle,
     Chasing,
     Attacking,
-    Knockback,
-
+    Knockback
 }
