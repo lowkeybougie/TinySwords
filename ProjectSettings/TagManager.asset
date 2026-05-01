@@ -14,7 +14,7 @@ TagManager:
   - Player
   - Enemy
   - Colliders
-  - 
+  - EnemyDetection
   - 
   - 
   - 
@@ -38,11 +38,17 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: particles
+    uniqueID: 1363613999
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
   - name: Enemy
     uniqueID: 1806336179
+    locked: 0
+  - name: EnemyDetection
+    uniqueID: 4106406481
     locked: 0
   m_RenderingLayers:
   - Default

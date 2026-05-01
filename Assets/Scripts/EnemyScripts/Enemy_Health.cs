@@ -29,15 +29,25 @@ public class Enemy_Health : MonoBehaviour
             currentHealth = maxHealth;
         }
         else if (currentHealth <= 0)
+            gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
         {
             Die();
         }
     }
 
-    private void Die()
+    
+    void Die()
     {
+        
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
+        
+        GetComponent<Collider2D>().enabled = false;
+
+       
         gameObject.SetActive(false);
     }
+
 
     public void ResetEnemy()
     {

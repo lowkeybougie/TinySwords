@@ -13,7 +13,8 @@ public class Enemy_Movement : MonoBehaviour
     [Header("Detection")]
     public float playerDetectionRange = 5f;
     public Transform detectionPoint;
-    public LayerMask playerLayer; 
+    public LayerMask playerLayer;
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip attackSFX;
@@ -33,27 +34,20 @@ public class Enemy_Movement : MonoBehaviour
         sr = GetComponent<SpriteRenderer>();
     }
 
-    void OnEnable()
+    void FixedUpdate()
     {
-        attackCooldownTimer = 0;
-       
-        if (player == null) ChangeState(EnemyState.Idle);
-    }
-
-    void Update()
-    {
-      
+        // If the knockback script is currently pushing the enemy, STOP moving
+        if (TryGetComponent(out Enemy_Knockback knock) && knock.IsBeingKnockedBack())
+        {
+            return;
+        }
         if (enemyState != EnemyState.Knockback)
         {
             CheckForPlayer();
+            if (attackCooldownTimer > 0) attackCooldownTimer -= Time.deltaTime;
 
-            if (attackCooldownTimer > 0)
-                attackCooldownTimer -= Time.deltaTime;
-
-            if (enemyState == EnemyState.Chasing)
-                Chase();
-            else if (enemyState == EnemyState.Attacking || enemyState == EnemyState.Idle)
-                rb.linearVelocity = Vector2.zero; 
+            if (enemyState == EnemyState.Chasing) Chase();
+            else if (enemyState == EnemyState.Attacking || enemyState == EnemyState.Idle) rb.linearVelocity = Vector2.zero;
         }
     }
 
@@ -61,9 +55,7 @@ public class Enemy_Movement : MonoBehaviour
     {
         if (player == null) return;
 
-       
-        if (player.position.x > transform.position.x && facingDirection == -1 ||
-            player.position.x < transform.position.x && facingDirection == 1)
+        if (player.position.x > transform.position.x && facingDirection == -1 || player.position.x < transform.position.x && facingDirection == 1)
         {
             Flip();
         }
@@ -74,20 +66,20 @@ public class Enemy_Movement : MonoBehaviour
 
     private void CheckForPlayer()
     {
-       
         Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectionRange, playerLayer);
 
         if (hits.Length > 0)
         {
             Transform target = hits[0].transform;
 
+            // Check if player is on the same sorting layer (same "floor")
             if (target.TryGetComponent(out SpriteRenderer playerSR))
             {
                 if (playerSR.sortingOrder != sr.sortingOrder)
                 {
-                    player = null;
-                    ChangeState(EnemyState.Idle);
-                    return;
+                   // player = null;
+                    //ChangeState(EnemyState.Idle);
+                    //return;
                 }
             }
 
@@ -98,9 +90,7 @@ public class Enemy_Movement : MonoBehaviour
             {
                 attackCooldownTimer = attackCooldown;
                 ChangeState(EnemyState.Attacking);
-
-                if (audioSource != null && attackSFX != null)
-                    audioSource.PlayOneShot(attackSFX);
+                if (audioSource != null && attackSFX != null) audioSource.PlayOneShot(attackSFX);
             }
             else if (distance > attackRange && enemyState != EnemyState.Attacking)
             {
@@ -114,30 +104,25 @@ public class Enemy_Movement : MonoBehaviour
         }
     }
 
+    // This is the method triggered by your Enemy's Attack Animation Event
     public void DealDamage()
     {
         Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, attackRange, playerLayer);
+
         foreach (Collider2D hit in hits)
         {
-            // Change pc to look for PlayerMovement instead of Player_Combat
+            // 1. Handle Knockback (References PlayerMovement script)
             if (hit.TryGetComponent(out PlayerMovement pm))
             {
-                // Call KnockBack on the movement script
                 pm.KnockBack(transform, knockbackForce, stunTime);
             }
 
+            // 2. Handle Health (References PlayerHealth script)
             if (hit.TryGetComponent(out PlayerHealth ph))
             {
                 ph.ChangeHealth(-damage);
             }
         }
-    }
-
-
-    public void SetInitialAggro(Transform targetTransform)
-    {
-        this.player = targetTransform;
-        ChangeState(EnemyState.Chasing);
     }
 
     public void ChangeState(EnemyState newState)
@@ -166,8 +151,16 @@ public class Enemy_Movement : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(detectionPoint.position, attackRange);
     }
-}
 
+    public void SetInitialAggro(Transform targetTransform)
+    {
+        this.player = targetTransform;
+        ChangeState(EnemyState.Chasing);
+    }
+
+} // This is the closing bracket for your Enemy_Movement class
+
+// ADD THIS BELOW THAT BRACKET:
 public enum EnemyState
 {
     Idle,
@@ -175,3 +168,4 @@ public enum EnemyState
     Attacking,
     Knockback
 }
+

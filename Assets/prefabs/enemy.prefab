@@ -322,6 +322,8 @@ MonoBehaviour:
   playerLayer:
     serializedVersion: 2
     m_Bits: 64
+  audioSource: {fileID: 503842948795758321}
+  attackSFX: {fileID: 8300000, guid: a8119c62f67810e4590dd7f76b2064cf, type: 3}
 --- !u!114 &6599764189044364036
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,7 +373,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 002c5b9dcf10de74e9cfdea04b340307, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

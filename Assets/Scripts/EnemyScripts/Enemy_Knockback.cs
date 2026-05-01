@@ -1,34 +1,39 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
-public class KnockBack : MonoBehaviour
+public class Enemy_Knockback : MonoBehaviour
 {
     private Rigidbody2D rb;
-    private Enemy_Movement enemy_Movement;
-    public float knockbackForce = 50; 
+    private bool isKnockedBack;
 
-    private void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        enemy_Movement = GetComponent<Enemy_Movement>();
     }
 
-    public void Knockback(Transform attackerTransform, float force, float stunTime, float knockbackTime)
+    public void Knockback(Transform attacker, float force, float stunTime, float delay)
     {
-        enemy_Movement.ChangeState(EnemyState.Knockback);
-        StopAllCoroutines();
+        // Safety check to prevent the "Inactive" error
+        if (gameObject.activeInHierarchy && !isKnockedBack)
+        {
+            StartCoroutine(KnockbackRoutine(attacker, force, stunTime));
+        }
+    }
 
-        Vector2 direction = (transform.position - attackerTransform.position).normalized;
+    private IEnumerator KnockbackRoutine(Transform attacker, float force, float stunTime)
+    {
+        isKnockedBack = true;
+
+        // Calculate direction and apply force
+        Vector2 direction = (transform.position - attacker.position).normalized;
         rb.linearVelocity = direction * force;
 
-        StartCoroutine(StunTimer(knockbackTime, stunTime));
+        yield return new WaitForSeconds(stunTime);
+
+        rb.linearVelocity = Vector2.zero; // Stop the sliding
+        isKnockedBack = false;
     }
 
-    IEnumerator StunTimer(float knockbackTime, float stunTime)
-    {
-        yield return new WaitForSeconds(knockbackTime);
-        rb.linearVelocity = Vector2.zero; 
-        yield return new WaitForSeconds(stunTime);
-        enemy_Movement.ChangeState(EnemyState.Idle);
-    }
+    // This property lets your Enemy_Movement script know to pause chasing
+    public bool IsBeingKnockedBack() => isKnockedBack;
 }
