@@ -1,72 +1,59 @@
-using System.Collections;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public int facingDirection = 1;
-    public float speed = 5;
+    public float speed = 5f;
     public Rigidbody2D rb;
     public Animator anim;
+    public Player_Combat playerCombat;
 
+    private Vector2 moveInput;
     private bool isKnockedBack;
 
-    public Player_Combat player_Combat;
-
-
-    private void Update()
+    void Update()
     {
+        // Collect input in Update for responsiveness
+        moveInput.x = Input.GetAxisRaw("Horizontal");
+        moveInput.y = Input.GetAxisRaw("Vertical");
+
         if (Input.GetButtonDown("Slash"))
         {
-            player_Combat.Attack();
+            playerCombat.Attack();
         }
     }
 
     void FixedUpdate()
     {
-
-        if (isKnockedBack == false)
+        // Stop movement if attacking OR knocked back
+        if (isKnockedBack || anim.GetBool("isAttacking"))
         {
-
-
-            float horizontal = Input.GetAxis("Horizontal");
-            float vertical = Input.GetAxis("Vertical");
-
-            if (horizontal > 0 && transform.localScale.x < 0 ||
-                horizontal < 0 && transform.localScale.x > 0)
-            {
-                Flip();
-            }
-
-            anim.SetFloat("horizontal", Mathf.Abs(horizontal));
-            anim.SetFloat("vertical", Mathf.Abs(vertical));
-
-            rb.linearVelocity = new Vector2(horizontal, vertical) * speed;
+            rb.linearVelocity = Vector2.zero;
+            return;
         }
-    }
 
-    void Flip()
-    {
-        facingDirection *= -1;
-        transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+        rb.linearVelocity = moveInput.normalized * speed;
+
+        if (moveInput.x != 0)
+        {
+            transform.localScale = new Vector3(Mathf.Sign(moveInput.x), 1, 1);
+        }
+
+        anim.SetFloat("horizontal", Mathf.Abs(moveInput.x));
+        anim.SetFloat("vertical", Mathf.Abs(moveInput.y));
     }
 
     public void KnockBack(Transform enemy, float force, float stunTime)
     {
-        isKnockedBack = true;
-        Vector2 direction = (transform.position - enemy.position).normalized;
-        rb.linearVelocity = direction * force;
-        StartCoroutine(KnockbackCounter(stunTime));
+        if (isKnockedBack) return;
+        StartCoroutine(KnockbackRoutine(enemy, force, stunTime));
     }
 
-    IEnumerator KnockbackCounter(float stunTime)
+    private System.Collections.IEnumerator KnockbackRoutine(Transform enemy, float force, float stunTime)
     {
+        isKnockedBack = true;
+        Vector2 dir = (transform.position - enemy.position).normalized;
+        rb.linearVelocity = dir * force;
         yield return new WaitForSeconds(stunTime);
-        rb.linearVelocity = Vector2.zero;
         isKnockedBack = false;
-
-
-
     }
-
 }
-

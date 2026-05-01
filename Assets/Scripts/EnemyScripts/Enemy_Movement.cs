@@ -119,9 +119,11 @@ public class Enemy_Movement : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, attackRange, playerLayer);
         foreach (Collider2D hit in hits)
         {
-            if (hit.TryGetComponent(out Player_Combat pc))
+            // Change pc to look for PlayerMovement instead of Player_Combat
+            if (hit.TryGetComponent(out PlayerMovement pm))
             {
-                pc.GetKnockedBack(transform, knockbackForce, stunTime);
+                // Call KnockBack on the movement script
+                pm.KnockBack(transform, knockbackForce, stunTime);
             }
 
             if (hit.TryGetComponent(out PlayerHealth ph))
@@ -130,6 +132,7 @@ public class Enemy_Movement : MonoBehaviour
             }
         }
     }
+
 
     public void SetInitialAggro(Transform targetTransform)
     {

@@ -52,6 +52,11 @@ MonoBehaviour:
   minTotalEnemies: 10
   maxTotalEnemies: 20
   spawnRadius: 0.67
+  safetyRadius: 1
+  obstacleLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  maxAttempts: 10
 --- !u!212 &8649708208054988796
 SpriteRenderer:
   serializedVersion: 2
