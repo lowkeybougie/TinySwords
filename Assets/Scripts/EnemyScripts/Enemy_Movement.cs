@@ -2,12 +2,21 @@ using UnityEngine;
 
 public class Enemy_Movement : MonoBehaviour
 {
-    public float attackRange = 2;
-    public float speed;
-    public float attackCooldown = 2;
-    public float playerDetectionRange = 5;
+    [Header("Combat Stats")]
+    public float attackRange = 2f;
+    public float speed = 3f;
+    public float attackCooldown = 2f;
+    public int damage = 1;
+    public float knockbackForce = 15f;
+    public float stunTime = 0.5f;
+
+    [Header("Detection")]
+    public float playerDetectionRange = 5f;
     public Transform detectionPoint;
-    public LayerMask playerLayer;
+    public LayerMask playerLayer; 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip attackSFX;
 
     private float attackCooldownTimer;
     private Rigidbody2D rb;
@@ -15,31 +24,25 @@ public class Enemy_Movement : MonoBehaviour
     private int facingDirection = 1;
     private Animator anim;
     private EnemyState enemyState;
+    private SpriteRenderer sr;
 
-    
     void Awake()
     {
-        // Getting components should stay in Awake or Start
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
-    // Add this new function:
     void OnEnable()
     {
-        // This runs every time the enemy is "spawned" from the pool
-        attackCooldownTimer = 0; // Reset their attack brain
-
-        if (player == null)
-        {
-            ChangeState(EnemyState.Idle);
-        }
+        attackCooldownTimer = 0;
+       
+        if (player == null) ChangeState(EnemyState.Idle);
     }
-
 
     void Update()
     {
-        // Don't process movement/AI logic if we are being knocked back
+      
         if (enemyState != EnemyState.Knockback)
         {
             CheckForPlayer();
@@ -50,7 +53,7 @@ public class Enemy_Movement : MonoBehaviour
             if (enemyState == EnemyState.Chasing)
                 Chase();
             else if (enemyState == EnemyState.Attacking || enemyState == EnemyState.Idle)
-                rb.linearVelocity = Vector2.zero; // Abrupt stop
+                rb.linearVelocity = Vector2.zero; 
         }
     }
 
@@ -58,34 +61,46 @@ public class Enemy_Movement : MonoBehaviour
     {
         if (player == null) return;
 
-        // Handle Flipping Sprite
-        if (player.position.x > transform.position.x && facingDirection == -1 || player.position.x < transform.position.x && facingDirection == 1)
+       
+        if (player.position.x > transform.position.x && facingDirection == -1 ||
+            player.position.x < transform.position.x && facingDirection == 1)
         {
             Flip();
         }
 
-        // Direct movement toward target
         Vector2 direction = (player.position - transform.position).normalized;
         rb.linearVelocity = direction * speed;
     }
 
     private void CheckForPlayer()
     {
+       
         Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, playerDetectionRange, playerLayer);
 
         if (hits.Length > 0)
         {
-            player = hits[0].transform;
-        }
+            Transform target = hits[0].transform;
 
-        if (player != null)
-        {
+            if (target.TryGetComponent(out SpriteRenderer playerSR))
+            {
+                if (playerSR.sortingOrder != sr.sortingOrder)
+                {
+                    player = null;
+                    ChangeState(EnemyState.Idle);
+                    return;
+                }
+            }
+
+            player = target;
             float distance = Vector2.Distance(transform.position, player.position);
 
             if (distance <= attackRange && attackCooldownTimer <= 0 && enemyState != EnemyState.Attacking)
             {
                 attackCooldownTimer = attackCooldown;
                 ChangeState(EnemyState.Attacking);
+
+                if (audioSource != null && attackSFX != null)
+                    audioSource.PlayOneShot(attackSFX);
             }
             else if (distance > attackRange && enemyState != EnemyState.Attacking)
             {
@@ -94,7 +109,25 @@ public class Enemy_Movement : MonoBehaviour
         }
         else
         {
+            player = null;
             ChangeState(EnemyState.Idle);
+        }
+    }
+
+    public void DealDamage()
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(detectionPoint.position, attackRange, playerLayer);
+        foreach (Collider2D hit in hits)
+        {
+            if (hit.TryGetComponent(out Player_Combat pc))
+            {
+                pc.GetKnockedBack(transform, knockbackForce, stunTime);
+            }
+
+            if (hit.TryGetComponent(out PlayerHealth ph))
+            {
+                ph.ChangeHealth(-damage);
+            }
         }
     }
 
@@ -102,21 +135,18 @@ public class Enemy_Movement : MonoBehaviour
     {
         this.player = targetTransform;
         ChangeState(EnemyState.Chasing);
-        Chase();
     }
 
     public void ChangeState(EnemyState newState)
     {
         if (enemyState == newState) return;
-
         enemyState = newState;
+
         anim.SetBool("isIdle", newState == EnemyState.Idle);
         anim.SetBool("isChasing", newState == EnemyState.Chasing);
 
         if (newState == EnemyState.Attacking)
-        {
             anim.SetTrigger("attackTrigger");
-        }
     }
 
     void Flip()
@@ -130,10 +160,11 @@ public class Enemy_Movement : MonoBehaviour
         if (detectionPoint == null) return;
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(detectionPoint.position, playerDetectionRange);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(detectionPoint.position, attackRange);
     }
 }
 
-// THIS PART FIXES YOUR ERRORS: It must be outside the class brackets
 public enum EnemyState
 {
     Idle,

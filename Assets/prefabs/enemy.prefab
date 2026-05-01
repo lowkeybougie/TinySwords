@@ -152,7 +152,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 5
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: -4230181108591323607, guid: e9ed14deeb1cbcd409b945ae0404eb44, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -314,7 +314,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abd70b51dabd294abd66864cad7bf05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy_Combat
-  damage: -1
+  damage: 1
   attackPoint: {fileID: 3784968118203687972}
   weaponRange: 1.2
   knockbackForce: 20
@@ -337,11 +337,16 @@ MonoBehaviour:
   attackRange: 1.2
   speed: 2
   attackCooldown: 2
+  damage: 1
+  knockbackForce: 15
+  stunTime: 0.5
   playerDetectionRange: 5
   detectionPoint: {fileID: 7930558756912176202}
   playerLayer:
     serializedVersion: 2
     m_Bits: 64
+  audioSource: {fileID: 0}
+  attackSFX: {fileID: 0}
 --- !u!114 &4580701883103538849
 MonoBehaviour:
   m_ObjectHideFlags: 0

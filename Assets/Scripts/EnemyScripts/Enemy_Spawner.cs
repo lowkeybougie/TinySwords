@@ -5,7 +5,7 @@ public class EnemySpawner : MonoBehaviour
 {
     [Header("Activation")]
     public float activationRange = 10f;
-    public Transform playerTransform; // Assign in Inspector or find in Start
+    private Transform playerTransform;
     private bool isActivated = false;
 
     [Header("Wave Settings")]
@@ -18,29 +18,26 @@ public class EnemySpawner : MonoBehaviour
 
     private int totalToSpawn;
     private int enemiesSpawnedSoFar = 0;
-    public float spawnRadius = 5.0f;
+    public float spawnRadius = 3.0f; 
 
     void Start()
     {
-        // Find the player in the scene by their tag
+        
         GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-
         if (playerObject != null)
         {
             playerTransform = playerObject.transform;
         }
-        else
-        {
-            Debug.LogError("Spawner could not find an object with the tag 'Player'!");
-        }
 
+        
         totalToSpawn = Random.Range(minTotalEnemies, maxTotalEnemies + 1);
     }
 
-
     void Update()
     {
-        // Only start the routine once the player is in range
+        if (playerTransform == null) return;
+
+        
         if (!isActivated && Vector2.Distance(transform.position, playerTransform.position) <= activationRange)
         {
             isActivated = true;
@@ -71,30 +68,24 @@ public class EnemySpawner : MonoBehaviour
         GameObject enemy = EnemyPooler.Instance.GetPooledEnemy();
         if (enemy != null)
         {
-            // FIX: Define the random position variable here
+            
             Vector2 randomPos = (Vector2)transform.position + Random.insideUnitCircle * spawnRadius;
-
             enemy.transform.position = randomPos;
 
-            // 1. Activate first
             enemy.SetActive(true);
 
-            // 2. Then reset health
-            if (enemy.TryGetComponent(out Enemy_Health health))
-                health.ResetEnemy();
-
-            // 3. Force them to chase the player immediately
-            if (enemy.TryGetComponent(out Enemy_Movement move))
-                move.SetInitialAggro(playerTransform);
+            if (enemy.TryGetComponent(out Enemy_Health health)) health.ResetEnemy();
+            if (enemy.TryGetComponent(out Enemy_Movement move)) move.SetInitialAggro(playerTransform);
         }
     }
 
-
-
-
-    private void OnDrawGizmosSelected() // Visual aid in editor
+    
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, activationRange);
+
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, spawnRadius);
     }
 }

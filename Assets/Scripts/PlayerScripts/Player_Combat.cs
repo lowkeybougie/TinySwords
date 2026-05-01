@@ -6,7 +6,7 @@ public class Player_Combat : MonoBehaviour
     public Animator anim;
     public Transform attackPoint;
     public float weaponRange = 1;
-    public float knockbackForce = 50; // The force YOU exert on enemies
+    public float knockbackForce = 50;
     public float stunTime = 0.3f;
     public float knockbackTime = .15f; 
     public LayerMask enemyLayer;
@@ -42,19 +42,36 @@ public class Player_Combat : MonoBehaviour
         }
     }
 
-    // Called by Animation Event when hitting an ENEMY
+    
     public void DealDamage()
     {
+        
         Collider2D[] enemies = Physics2D.OverlapCircleAll(attackPoint.position, weaponRange, enemyLayer);
+
         foreach (Collider2D enemy in enemies)
         {
-            enemy.GetComponent<Enemy_Health>().ChangeHealth(-damage);
-            // Push the enemy away using YOUR force
-            enemy.GetComponent<KnockBack>().Knockback(transform, knockbackForce, knockbackTime, stunTime);
+            
+            if (enemy.TryGetComponent(out Enemy_Health health))
+            {
+                health.ChangeHealth(-damage);
+            }
+
+            
+            if (enemy.TryGetComponent(out Enemy_Movement move))
+            {
+                
+            }
+
+           
+            if (EffectPooler.instance != null)
+            {
+                EffectPooler.instance.PlayEffect(enemy.transform.position);
+            }
         }
     }
 
-    // NEW: Call this when an enemy hits the PLAYER
+
+   
     public void GetKnockedBack(Transform enemyTransform, float force, float stun)
     {
         StopAllCoroutines();
@@ -67,7 +84,7 @@ public class Player_Combat : MonoBehaviour
     IEnumerator StunTimer(float time)
     {
         yield return new WaitForSeconds(time);
-        rb.linearVelocity = Vector2.zero; // Abrupt stop
+        rb.linearVelocity = Vector2.zero;
     }
 
     public void FinishAttacking() { anim.SetBool("isAttacking", false); }

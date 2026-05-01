@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Player
   - Enemy
-  - 
+  - Colliders
   - 
   - 
   - 
@@ -40,6 +40,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Enemy
+    uniqueID: 1806336179
     locked: 0
   m_RenderingLayers:
   - Default

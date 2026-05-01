@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 6541023851177665744}
   - component: {fileID: 5677585011242566988}
   - component: {fileID: 8649708208054988796}
-  m_Layer: 0
+  - component: {fileID: 3375775146404358783}
+  m_Layer: 7
   m_Name: EnemySpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -46,7 +47,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   activationRange: 10
-  playerTransform: {fileID: 266632062773141706, guid: 9e5d6f7f73b79ce43b72d78712d9a3a1, type: 3}
   timeBetweenWaves: 30
   enemiesPerWave: 3
   minTotalEnemies: 10
@@ -97,9 +97,9 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: 1806336179
+  m_SortingLayer: 1
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: -3131899431819038481, guid: 8fa5604b80e7cd54aa1c6421dea7bad2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -111,3 +111,40 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!70 &3375775146404358783
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7343393711253308951}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Size: {x: 1.796875, y: 2.296875}
+  m_Direction: 0

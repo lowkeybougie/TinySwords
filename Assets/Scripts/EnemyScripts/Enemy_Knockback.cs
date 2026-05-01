@@ -5,7 +5,7 @@ public class KnockBack : MonoBehaviour
 {
     private Rigidbody2D rb;
     private Enemy_Movement enemy_Movement;
-    public float knockbackForce = 50; // The force the ENEMY exerts on the player
+    public float knockbackForce = 50; 
 
     private void Start()
     {
@@ -27,7 +27,7 @@ public class KnockBack : MonoBehaviour
     IEnumerator StunTimer(float knockbackTime, float stunTime)
     {
         yield return new WaitForSeconds(knockbackTime);
-        rb.linearVelocity = Vector2.zero; // Abrupt stop
+        rb.linearVelocity = Vector2.zero; 
         yield return new WaitForSeconds(stunTime);
         enemy_Movement.ChangeState(EnemyState.Idle);
     }

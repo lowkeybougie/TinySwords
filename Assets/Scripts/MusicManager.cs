@@ -7,11 +7,11 @@ public class MusicManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton pattern: Ensure only one MusicManager exists
+       
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // Keeps music playing across scenes
+            DontDestroyOnLoad(gameObject); 
         }
         else
         {

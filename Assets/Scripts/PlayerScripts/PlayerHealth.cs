@@ -6,23 +6,42 @@ public class PlayerHealth : MonoBehaviour
     public int currentHealth;
     public int maxHealth;
 
-    public TMP_Text healthText;
+    [Header("UI References")]
+    public TMP_Text healthText; // Drag your TextMeshPro object here
     public Animator healthTextAnim;
 
     private void Start()
     {
-        healthText.text = "HP: " + currentHealth + " / " + maxHealth;
+        // Initialize health if not set
+        if (currentHealth <= 0) currentHealth = maxHealth;
+        UpdateUI();
     }
 
     public void ChangeHealth(int amount)
     {
         currentHealth += amount;
-        healthTextAnim.Play("TextUpdate");
-        healthText.text = "HP: " + currentHealth + " / " + maxHealth;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
 
-        if (currentHealth <= 0)
+        UpdateUI();
+        if (healthTextAnim != null) healthTextAnim.Play("TextUpdate");
+
+        if (currentHealth <= 0) Die();
+    }
+
+    private void UpdateUI()
+    {
+        if (healthText != null)
         {
-            gameObject.SetActive(false);
+            healthText.text = "HP: " + currentHealth + " / " + maxHealth;
         }
+    }
+
+    private void Die()
+    {
+        if (GameOverManager.instance != null)
+        {
+            GameOverManager.instance.ShowGameOver();
+        }
+        gameObject.SetActive(false);
     }
 }

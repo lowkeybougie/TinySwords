@@ -7,7 +7,7 @@ public class Enemy_Health : MonoBehaviour
 
     [Header("Audio")]
     public AudioSource audioSource;
-    public AudioClip hitSFX; // The "Enemy Ouch" sound
+    public AudioClip hitSFX; 
 
     private void Start()
     {
@@ -18,7 +18,7 @@ public class Enemy_Health : MonoBehaviour
     {
         currentHealth += amount;
 
-        // If taking damage (negative amount), play the sound
+       
         if (amount < 0 && audioSource != null && hitSFX != null)
         {
             audioSource.PlayOneShot(hitSFX);
